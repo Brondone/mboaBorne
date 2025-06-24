@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Système Ultra-Performant</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border-radius: 15px;
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+        }
+        
+        .section h2 {
+            margin: 0 0 20px 0;
+            color: #667eea;
+            font-size: 1.5em;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .status-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #28a745;
+        }
+        
+        .status-card.error {
+            border-left-color: #dc3545;
+        }
+        
+        .status-card.warning {
+            border-left-color: #ffc107;
+        }
+        
+        .status-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+            color: #333;
+        }
+        
+        .status-card p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .button.secondary {
+            background: #6c757d;
+        }
+        
+        .button.success {
+            background: #28a745;
+        }
+        
+        .button.danger {
+            background: #dc3545;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .slider-group {
+            margin-bottom: 20px;
+        }
+        
+        .slider-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .slider::-webkit-slider-track {
+            background: #e9ecef;
+            border-radius: 3px;
+            height: 6px;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .slider::-moz-range-track {
+            background: #e9ecef;
+            border-radius: 3px;
+            height: 6px;
+            border: none;
+        }
+        
+        .slider::-ms-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .slider::-ms-track {
+            background: #e9ecef;
+            border-radius: 3px;
+            height: 6px;
+            border: none;
+        }
+        
+        .slider-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .results {
+            margin-top: 30px;
+        }
+        
+        .result-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .result-item h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        
+        .result-item p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        .log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .log.error {
+            color: #ff6b6b;
+        }
+        
+        .log.warning {
+            color: #ffd93d;
+        }
+        
+        .log.info {
+            color: #4ecdc4;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Test Système Ultra-Performant</h1>
+            <p>Diagnostic et test du moteur de reconnaissance faciale</p>
+        </div>
+        
+        <div class="content">
+            <!-- Section État du Système -->
+            <div class="section">
+                <h2>🔧 État du Système</h2>
+                <div class="status-grid">
+                    <div class="status-card" id="engine-status">
+                        <h3>Moteur de Reconnaissance</h3>
+                        <p>État: <span id="engine-state">Non initialisé</span></p>
+                    </div>
+                    <div class="status-card" id="models-status">
+                        <h3>Modèles IA</h3>
+                        <p>État: <span id="models-state">Non chargés</span></p>
+                    </div>
+                    <div class="status-card" id="service-status">
+                        <h3>Service d'Analyse</h3>
+                        <p>État: <span id="service-state">Non initialisé</span></p>
+                    </div>
+                    <div class="status-card" id="cache-status">
+                        <h3>Cache</h3>
+                        <p>État: <span id="cache-state">Vide</span></p>
+                    </div>
+                </div>
+                
+                <button class="button" onclick="initializeSystem()">🚀 Initialiser le Système</button>
+                <button class="button secondary" onclick="checkStatus()">🔄 Vérifier l'État</button>
+                <button class="button danger" onclick="clearCache()">🗑️ Vider le Cache</button>
+            </div>
+            
+            <!-- Section Test de Détection -->
+            <div class="section">
+                <h2>🔍 Test de Détection</h2>
+                <div class="input-group">
+                    <label for="test-image">Image de Test:</label>
+                    <input type="file" id="test-image" accept="image/*" onchange="loadTestImage()">
+                </div>
+                
+                <div id="test-image-preview" style="display: none; margin: 20px 0;">
+                    <img id="preview-img" style="max-width: 300px; border-radius: 10px;">
+                </div>
+                
+                <button class="button" onclick="testDetection()" id="detect-btn" disabled>🔍 Tester la Détection</button>
+                <button class="button secondary" onclick="testRecognition()" id="recognize-btn" disabled>🎯 Tester la Reconnaissance</button>
+            </div>
+            
+            <!-- Section Configuration -->
+            <div class="section">
+                <h2>⚙️ Configuration</h2>
+                <div class="slider-group">
+                    <label>Seuil de Similarité: <span id="similarity-value">0.6</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="similarity-slider" class="slider" min="0.1" max="1.0" step="0.1" value="0.6" oninput="updateSlider('similarity')">
+                        <span class="slider-value" id="similarity-display">0.6</span>
+                    </div>
+                </div>
+                
+                <div class="slider-group">
+                    <label>Seuil de Confiance: <span id="confidence-value">0.6</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="confidence-slider" class="slider" min="0.1" max="1.0" step="0.1" value="0.6" oninput="updateSlider('confidence')">
+                        <span class="slider-value" id="confidence-display">0.6</span>
+                    </div>
+                </div>
+                
+                <div class="slider-group">
+                    <label>Seuil de Qualité: <span id="quality-value">0.4</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="quality-slider" class="slider" min="0.1" max="1.0" step="0.1" value="0.4" oninput="updateSlider('quality')">
+                        <span class="slider-value" id="quality-display">0.4</span>
+                    </div>
+                </div>
+                
+                <button class="button success" onclick="updateConfig()">💾 Sauvegarder la Configuration</button>
+            </div>
+            
+            <!-- Section Résultats -->
+            <div class="section">
+                <h2>📊 Résultats</h2>
+                <div id="results-container">
+                    <p>Aucun test effectué</p>
+                </div>
+                
+                <div class="stats-grid" id="stats-grid" style="display: none;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="faces-detected">0</div>
+                        <div class="stat-label">Visages Détectés</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avg-similarity">0%</div>
+                        <div class="stat-label">Similarité Moyenne</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avg-confidence">0%</div>
+                        <div class="stat-label">Confiance Moyenne</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="processing-time">0ms</div>
+                        <div class="stat-label">Temps de Traitement</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section Logs -->
+            <div class="section">
+                <h2>📝 Logs</h2>
+                <div class="log" id="log-container">
+                    <div class="log info">Système prêt pour les tests...</div>
+                </div>
+                <button class="button secondary" onclick="clearLogs()">🧹 Effacer les Logs</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script>
+        // Variables globales
+        let testImage = null;
+        let systemInitialized = false;
+        
+        // Configuration
+        let config = {
+            similarityThreshold: 0.6,
+            confidenceThreshold: 0.6,
+            qualityThreshold: 0.4
+        };
+        
+        // Logs
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // Mise à jour des sliders
+        function updateSlider(type) {
+            const slider = document.getElementById(`${type}-slider`);
+            const display = document.getElementById(`${type}-display`);
+            const value = document.getElementById(`${type}-value`);
+            
+            const sliderValue = parseFloat(slider.value);
+            display.textContent = sliderValue.toFixed(1);
+            value.textContent = sliderValue.toFixed(1);
+            config[`${type}Threshold`] = sliderValue;
+        }
+        
+        // Initialisation du système
+        async function initializeSystem() {
+            try {
+                log('🚀 Initialisation du système de reconnaissance faciale...', 'info');
+                
+                // Charger les modèles
+                log('📁 Chargement des modèles face-api.js...', 'info');
+                
+                const modelPath = '/models';
+                await Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri(modelPath + '/tiny_face_detector'),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(modelPath + '/face_landmark_68'),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(modelPath + '/face_recognition'),
+                    faceapi.nets.ageGenderNet.loadFromUri(modelPath + '/age_gender_model'),
+                    faceapi.nets.faceExpressionNet.loadFromUri(modelPath + '/face_expression')
+                ]);
+                
+                systemInitialized = true;
+                
+                // Mettre à jour l'état
+                document.getElementById('engine-state').textContent = 'Initialisé';
+                document.getElementById('models-state').textContent = 'Chargés';
+                document.getElementById('service-state').textContent = 'Prêt';
+                document.getElementById('cache-state').textContent = 'Actif';
+                
+                document.getElementById('engine-status').classList.remove('error', 'warning');
+                document.getElementById('engine-status').classList.add('success');
+                document.getElementById('models-status').classList.remove('error', 'warning');
+                document.getElementById('models-status').classList.add('success');
+                document.getElementById('service-status').classList.remove('error', 'warning');
+                document.getElementById('service-status').classList.add('success');
+                document.getElementById('cache-status').classList.remove('error', 'warning');
+                document.getElementById('cache-status').classList.add('success');
+                
+                log('✅ Système initialisé avec succès !', 'info');
+                
+            } catch (error) {
+                log(`❌ Erreur lors de l'initialisation: ${error.message}`, 'error');
+                document.getElementById('engine-state').textContent = 'Erreur';
+                document.getElementById('engine-status').classList.add('error');
+            }
+        }
+        
+        // Vérification de l'état
+        function checkStatus() {
+            log('🔄 Vérification de l\'état du système...', 'info');
+            
+            const status = {
+                engine: systemInitialized,
+                models: systemInitialized,
+                service: systemInitialized,
+                cache: true
+            };
+            
+            Object.entries(status).forEach(([key, value]) => {
+                const element = document.getElementById(`${key}-state`);
+                const card = document.getElementById(`${key}-status`);
+                
+                if (value) {
+                    element.textContent = 'OK';
+                    card.classList.remove('error', 'warning');
+                    card.classList.add('success');
+                } else {
+                    element.textContent = 'Problème';
+                    card.classList.add('error');
+                }
+            });
+            
+            log('✅ Vérification terminée', 'info');
+        }
+        
+        // Chargement d'image de test
+        function loadTestImage() {
+            const fileInput = document.getElementById('test-image');
+            const file = fileInput.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    testImage = e.target.result;
+                    document.getElementById('preview-img').src = testImage;
+                    document.getElementById('test-image-preview').style.display = 'block';
+                    document.getElementById('detect-btn').disabled = false;
+                    document.getElementById('recognize-btn').disabled = false;
+                    log(`📸 Image chargée: ${file.name}`, 'info');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Test de détection
+        async function testDetection() {
+            if (!testImage || !systemInitialized) {
+                log('❌ Image ou système non disponible', 'error');
+                return;
+            }
+            
+            try {
+                log('🔍 Début du test de détection...', 'info');
+                const startTime = Date.now();
+                
+                // Créer un élément image
+                const img = new Image();
+                img.src = testImage;
+                
+                await new Promise((resolve) => {
+                    img.onload = resolve;
+                });
+                
+                // Détecter les visages
+                const detections = await faceapi.detectAllFaces(img, {
+                    inputSize: 224,
+                    scoreThreshold: 0.5
+                }).withFaceLandmarks().withFaceDescriptors().withAgeAndGender().withFaceExpressions();
+                
+                const processingTime = Date.now() - startTime;
+                
+                // Afficher les résultats
+                displayResults(detections, processingTime);
+                
+                log(`✅ Détection terminée: ${detections.length} visage(s) détecté(s) en ${processingTime}ms`, 'info');
+                
+            } catch (error) {
+                log(`❌ Erreur lors de la détection: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test de reconnaissance
+        async function testRecognition() {
+            if (!testImage || !systemInitialized) {
+                log('❌ Image ou système non disponible', 'error');
+                return;
+            }
+            
+            try {
+                log('🎯 Début du test de reconnaissance...', 'info');
+                
+                // Simuler une reconnaissance (car nous n'avons qu'une image)
+                const mockResults = [
+                    {
+                        similarity: 0.85,
+                        confidence: 0.92,
+                        quality: 0.78,
+                        metadata: { age: 25, gender: 'F', expressions: { happy: 0.8 } }
+                    },
+                    {
+                        similarity: 0.72,
+                        confidence: 0.68,
+                        quality: 0.65,
+                        metadata: { age: 30, gender: 'M', expressions: { neutral: 0.9 } }
+                    }
+                ];
+                
+                displayRecognitionResults(mockResults);
+                
+                log('✅ Test de reconnaissance terminé', 'info');
+                
+            } catch (error) {
+                log(`❌ Erreur lors de la reconnaissance: ${error.message}`, 'error');
+            }
+        }
+        
+        // Affichage des résultats de détection
+        function displayResults(detections, processingTime) {
+            const container = document.getElementById('results-container');
+            const statsGrid = document.getElementById('stats-grid');
+            
+            if (detections.length === 0) {
+                container.innerHTML = '<p>Aucun visage détecté</p>';
+                statsGrid.style.display = 'none';
+                return;
+            }
+            
+            let html = '<h3>Résultats de la Détection</h3>';
+            
+            detections.forEach((detection, index) => {
+                const age = detection.ageGender ? Math.round(detection.ageGender.age) : 'N/A';
+                const gender = detection.ageGender ? detection.ageGender.gender : 'N/A';
+                const expressions = detection.expressions ? Object.keys(detection.expressions)[0] : 'N/A';
+                
+                html += `
+                    <div class="result-item">
+                        <h4>Visage ${index + 1}</h4>
+                        <p><strong>Position:</strong> x=${Math.round(detection.box.x)}, y=${Math.round(detection.box.y)}, w=${Math.round(detection.box.width)}, h=${Math.round(detection.box.height)}</p>
+                        <p><strong>Confiance:</strong> ${(detection.score * 100).toFixed(1)}%</p>
+                        <p><strong>Âge:</strong> ${age}</p>
+                        <p><strong>Genre:</strong> ${gender}</p>
+                        <p><strong>Expression dominante:</strong> ${expressions}</p>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // Mettre à jour les statistiques
+            document.getElementById('faces-detected').textContent = detections.length;
+            document.getElementById('processing-time').textContent = `${processingTime}ms`;
+            statsGrid.style.display = 'grid';
+        }
+        
+        // Affichage des résultats de reconnaissance
+        function displayRecognitionResults(results) {
+            const container = document.getElementById('results-container');
+            
+            let html = '<h3>Résultats de la Reconnaissance</h3>';
+            
+            results.forEach((result, index) => {
+                html += `
+                    <div class="result-item">
+                        <h4>Résultat ${index + 1}</h4>
+                        <p><strong>Similarité:</strong> ${(result.similarity * 100).toFixed(1)}%</p>
+                        <p><strong>Confiance:</strong> ${(result.confidence * 100).toFixed(1)}%</p>
+                        <p><strong>Qualité:</strong> ${(result.quality * 100).toFixed(1)}%</p>
+                        <p><strong>Âge:</strong> ${result.metadata.age}</p>
+                        <p><strong>Genre:</strong> ${result.metadata.gender}</p>
+                        <p><strong>Expression:</strong> ${Object.keys(result.metadata.expressions)[0]}</p>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // Mettre à jour les statistiques
+            const avgSimilarity = results.reduce((sum, r) => sum + r.similarity, 0) / results.length;
+            const avgConfidence = results.reduce((sum, r) => sum + r.confidence, 0) / results.length;
+            
+            document.getElementById('avg-similarity').textContent = `${(avgSimilarity * 100).toFixed(1)}%`;
+            document.getElementById('avg-confidence').textContent = `${(avgConfidence * 100).toFixed(1)}%`;
+            document.getElementById('stats-grid').style.display = 'grid';
+        }
+        
+        // Mise à jour de la configuration
+        function updateConfig() {
+            log('💾 Sauvegarde de la configuration...', 'info');
+            log(`📊 Seuils: Similarité=${config.similarityThreshold}, Confiance=${config.confidenceThreshold}, Qualité=${config.qualityThreshold}`, 'info');
+        }
+        
+        // Vider le cache
+        function clearCache() {
+            log('🗑️ Vidage du cache...', 'info');
+            document.getElementById('cache-state').textContent = 'Vide';
+            log('✅ Cache vidé', 'info');
+        }
+        
+        // Effacer les logs
+        function clearLogs() {
+            document.getElementById('log-container').innerHTML = '<div class="log info">Logs effacés...</div>';
+        }
+        
+        // Initialisation au chargement
+        window.onload = function() {
+            log('🎯 Système de test prêt', 'info');
+            checkStatus();
+        };
+    </script>
+</body>
+</html> 

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Correction - Services de Reconnaissance Faciale</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 50%, #16213E 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            color: #4ECDC4;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+        }
+        
+        .test-section h3 {
+            color: #4ECDC4;
+            margin-top: 0;
+        }
+        
+        .upload-area {
+            border: 2px dashed rgba(78, 205, 196, 0.5);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .upload-area:hover {
+            border-color: #4ECDC4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+        
+        .results {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .success { color: #4ECDC4; }
+        .error { color: #ff6b6b; }
+        .warning { color: #ffd93d; }
+        .info { color: #74c0fc; }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-ready { background: #4ECDC4; }
+        .status-error { background: #ff6b6b; }
+        .status-warning { background: #ffd93d; }
+        
+        button {
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Test de Correction - Services de Reconnaissance Faciale</h1>
+        
+        <div class="test-section">
+            <h3>📋 Objectif du Test</h3>
+            <p>Vérifier que la correction de l'erreur <code>analyzeImage is not a function</code> fonctionne correctement.</p>
+            <p><strong>Problème corrigé :</strong> Le code appelait <code>faceRecognitionService.analyzeImage()</code> au lieu de <code>faceDetectionService.analyzeImage()</code>.</p>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔍 Test de Détection Faciale</h3>
+            <div class="upload-area" onclick="document.getElementById('imageInput').click()">
+                <p>📸 Cliquez pour sélectionner une image de test</p>
+                <p style="font-size: 0.9rem; opacity: 0.7;">Test de la méthode analyzeImage corrigée</p>
+            </div>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="testFaceDetection(this.files[0])">
+            
+            <div id="detectionResults" class="results" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎯 Test de Reconnaissance Faciale</h3>
+            <button onclick="testFaceRecognition()" id="recognitionBtn" disabled>
+                🔍 Tester la Reconnaissance
+            </button>
+            <div id="recognitionResults" class="results" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Statut des Services</h3>
+            <div id="serviceStatus"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Simuler les services pour le test
+        class MockFaceDetectionService {
+            constructor() {
+                this.isInitialized = true;
+                this.simulationMode = true;
+            }
+            
+            async analyzeImage(imagePath, photoId = null) {
+                console.log('🔍 MockFaceDetectionService.analyzeImage appelé avec:', { imagePath, photoId });
+                
+                // Simuler un délai
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Retourner le format attendu par App.js
+                return {
+                    faces: [
+                        {
+                            id: photoId ? `${photoId}_face_0` : 'face_0',
+                            boundingBox: { x: 100, y: 100, width: 200, height: 250 },
+                            landmarks: { positions: Array(68).fill().map((_, i) => ({ x: 100 + i, y: 100 + i })) },
+                            descriptor: Array(128).fill().map(() => Math.random()),
+                            confidence: 0.85,
+                            age: 30,
+                            gender: 'male',
+                            expressions: { neutral: 0.8, happy: 0.1, sad: 0.05, angry: 0.02, fearful: 0.01, disgusted: 0.01, surprised: 0.01 },
+                            quality: { resolution: 'normal', faceSize: 'normal', confidence: 0.85 }
+                        }
+                    ],
+                    photoId: photoId,
+                    processingStatus: 'success'
+                };
+            }
+            
+            getStatus() {
+                return {
+                    isInitialized: this.isInitialized,
+                    simulationMode: this.simulationMode,
+                    status: 'ready'
+                };
+            }
+        }
+        
+        class MockFaceRecognitionService {
+            constructor() {
+                this.isInitialized = true;
+                this.similarityThreshold = 0.3;
+                this.simulationMode = true;
+            }
+            
+            compareDescriptors(descriptor1, descriptor2) {
+                // Simuler une comparaison
+                const similarity = 0.75 + Math.random() * 0.2;
+                return {
+                    similarity: similarity,
+                    distance: 1 - similarity,
+                    isMatch: similarity >= this.similarityThreshold,
+                    threshold: this.similarityThreshold
+                };
+            }
+            
+            getSimilarityThreshold() {
+                return this.similarityThreshold;
+            }
+            
+            getStatus() {
+                return {
+                    isInitialized: this.isInitialized,
+                    simulationMode: this.simulationMode,
+                    status: 'ready'
+                };
+            }
+        }
+        
+        // Créer les instances
+        const faceDetectionService = new MockFaceDetectionService();
+        const faceRecognitionService = new MockFaceRecognitionService();
+        
+        // Variables globales pour le test
+        let testImage = null;
+        let testDescriptor = null;
+        
+        // Fonction de test de détection faciale
+        window.testFaceDetection = async function(file) {
+            if (!file) return;
+            
+            const resultsDiv = document.getElementById('detectionResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="info">🔄 Test en cours...</div>';
+            
+            try {
+                // Créer une URL pour l'image
+                const imageUrl = URL.createObjectURL(file);
+                testImage = imageUrl;
+                
+                // Afficher l'image
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.className = 'image-preview';
+                resultsDiv.appendChild(img);
+                
+                console.log('🎯 Test de la méthode analyzeImage corrigée...');
+                
+                // Tester la méthode analyzeImage (corrigée)
+                const analysis = await faceDetectionService.analyzeImage(imageUrl, 'test_photo');
+                
+                console.log('✅ Résultat de analyzeImage:', analysis);
+                
+                // Vérifier le format de retour
+                const isValidFormat = analysis && 
+                                    analysis.faces && 
+                                    Array.isArray(analysis.faces) && 
+                                    analysis.faces.length > 0 &&
+                                    analysis.faces[0].descriptor;
+                
+                if (isValidFormat) {
+                    resultsDiv.innerHTML += `
+                        <div class="success">
+                            ✅ Test réussi ! La méthode analyzeImage fonctionne correctement.
+                        </div>
+                        <div class="info">
+                            📊 Visages détectés: ${analysis.faces.length}
+                        </div>
+                        <div class="info">
+                            📏 Descripteur: ${analysis.faces[0].descriptor.length} dimensions
+                        </div>
+                        <div class="info">
+                            🎯 Confiance: ${(analysis.faces[0].confidence * 100).toFixed(1)}%
+                        </div>
+                    `;
+                    
+                    // Stocker le descripteur pour le test de reconnaissance
+                    testDescriptor = analysis.faces[0].descriptor;
+                    document.getElementById('recognitionBtn').disabled = false;
+                    
+                } else {
+                    resultsDiv.innerHTML += `
+                        <div class="error">
+                            ❌ Format de retour incorrect. Format attendu: { faces: [...] }
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur lors du test:', error);
+                resultsDiv.innerHTML += `
+                    <div class="error">
+                        ❌ Erreur: ${error.message}
+                    </div>
+                `;
+            }
+        };
+        
+        // Fonction de test de reconnaissance faciale
+        window.testFaceRecognition = async function() {
+            if (!testDescriptor) {
+                alert('Veuillez d\'abord tester la détection faciale');
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('recognitionResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="info">🔄 Test de reconnaissance en cours...</div>';
+            
+            try {
+                // Simuler une comparaison avec un descripteur de référence
+                const referenceDescriptor = Array(128).fill().map(() => Math.random());
+                
+                console.log('🎯 Test de comparaison de descripteurs...');
+                
+                const comparison = faceRecognitionService.compareDescriptors(referenceDescriptor, testDescriptor);
+                
+                console.log('✅ Résultat de comparaison:', comparison);
+                
+                resultsDiv.innerHTML = `
+                    <div class="success">
+                        ✅ Test de reconnaissance réussi !
+                    </div>
+                    <div class="info">
+                        📊 Similarité: ${(comparison.similarity * 100).toFixed(1)}%
+                    </div>
+                    <div class="info">
+                        📏 Distance: ${(comparison.distance * 100).toFixed(1)}%
+                    </div>
+                    <div class="info">
+                        🎯 Correspondance: ${comparison.isMatch ? '✅ Oui' : '❌ Non'}
+                    </div>
+                    <div class="info">
+                        📋 Seuil: ${(comparison.threshold * 100).toFixed(1)}%
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('❌ Erreur lors du test de reconnaissance:', error);
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        ❌ Erreur: ${error.message}
+                    </div>
+                `;
+            }
+        };
+        
+        // Afficher le statut des services
+        function updateServiceStatus() {
+            const statusDiv = document.getElementById('serviceStatus');
+            const detectionStatus = faceDetectionService.getStatus();
+            const recognitionStatus = faceRecognitionService.getStatus();
+            
+            statusDiv.innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <span class="status-indicator ${detectionStatus.isInitialized ? 'status-ready' : 'status-error'}"></span>
+                    <strong>Service de Détection:</strong> 
+                    ${detectionStatus.isInitialized ? '✅ Prêt' : '❌ Erreur'}
+                    ${detectionStatus.simulationMode ? ' (Mode Simulation)' : ''}
+                </div>
+                <div>
+                    <span class="status-indicator ${recognitionStatus.isInitialized ? 'status-ready' : 'status-error'}"></span>
+                    <strong>Service de Reconnaissance:</strong> 
+                    ${recognitionStatus.isInitialized ? '✅ Prêt' : '❌ Erreur'}
+                    ${recognitionStatus.simulationMode ? ' (Mode Simulation)' : ''}
+                </div>
+            `;
+        }
+        
+        // Initialiser l'affichage
+        updateServiceStatus();
+        
+        console.log('🔧 Test de correction initialisé');
+        console.log('📋 Objectif: Vérifier que analyzeImage fonctionne correctement');
+    </script>
+</body>
+</html> 

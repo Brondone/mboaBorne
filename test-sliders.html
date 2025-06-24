@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sliders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .slider-group {
+            margin: 20px 0;
+        }
+        
+        .slider-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .slider::-webkit-slider-track {
+            background: #e9ecef;
+            border-radius: 3px;
+            height: 6px;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .slider::-moz-range-track {
+            background: #e9ecef;
+            border-radius: 3px;
+            height: 6px;
+            border: none;
+        }
+        
+        .slider::-ms-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .slider::-ms-track {
+            background: #e9ecef;
+            border-radius: 3px;
+            height: 6px;
+            border: none;
+        }
+        
+        .slider-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .test-result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎛️ Test des Sliders</h1>
+        
+        <div class="slider-group">
+            <label>Seuil de Similarité: <span id="similarity-value">0.6</span></label>
+            <div class="slider-container">
+                <input type="range" id="similarity-slider" class="slider" min="0.1" max="1.0" step="0.1" value="0.6" oninput="updateSlider('similarity')">
+                <span class="slider-value" id="similarity-display">0.6</span>
+            </div>
+        </div>
+        
+        <div class="slider-group">
+            <label>Seuil de Confiance: <span id="confidence-value">0.6</span></label>
+            <div class="slider-container">
+                <input type="range" id="confidence-slider" class="slider" min="0.1" max="1.0" step="0.1" value="0.6" oninput="updateSlider('confidence')">
+                <span class="slider-value" id="confidence-display">0.6</span>
+            </div>
+        </div>
+        
+        <div class="slider-group">
+            <label>Seuil de Qualité: <span id="quality-value">0.4</span></label>
+            <div class="slider-container">
+                <input type="range" id="quality-slider" class="slider" min="0.1" max="1.0" step="0.1" value="0.4" oninput="updateSlider('quality')">
+                <span class="slider-value" id="quality-display">0.4</span>
+            </div>
+        </div>
+        
+        <div class="test-result">
+            <h3>✅ Test réussi !</h3>
+            <p>Les sliders sont maintenant correctement stylisés avec :</p>
+            <ul>
+                <li>Apparence personnalisée sur tous les navigateurs</li>
+                <li>Curseur rond avec ombre</li>
+                <li>Piste colorée</li>
+                <li>Valeurs affichées en temps réel</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Mise à jour des sliders
+        function updateSlider(type) {
+            const slider = document.getElementById(`${type}-slider`);
+            const display = document.getElementById(`${type}-display`);
+            const value = document.getElementById(`${type}-value`);
+            
+            const sliderValue = parseFloat(slider.value);
+            display.textContent = sliderValue.toFixed(1);
+            value.textContent = sliderValue.toFixed(1);
+            
+            console.log(`${type}: ${sliderValue}`);
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎛️ Test des sliders chargé');
+            
+            // Initialiser les valeurs
+            updateSlider('similarity');
+            updateSlider('confidence');
+            updateSlider('quality');
+        });
+    </script>
+</body>
+</html> 

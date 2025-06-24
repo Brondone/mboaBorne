@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Protocole Personnalisé - Final</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Protocole Personnalisé - Version Finale</h1>
+        
+        <div class="test-section info">
+            <h3>📋 Informations de l'environnement</h3>
+            <p><strong>URL actuelle:</strong> <span id="current-url"></span></p>
+            <p><strong>Protocole:</strong> <span id="protocol"></span></p>
+            <p><strong>Mode Electron:</strong> <span id="is-electron"></span></p>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Test du Protocole Personnalisé</h3>
+            <button onclick="testProtocol()">Tester models://</button>
+            <button onclick="testFileProtocol()">Tester file://</button>
+            <button onclick="testRelativePath()">Tester chemin relatif</button>
+            <div id="protocol-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📁 Test d'Accès aux Modèles</h3>
+            <button onclick="testModelAccess()">Tester accès aux modèles</button>
+            <div id="model-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Test Face-API.js</h3>
+            <button onclick="testFaceAPI()">Tester chargement face-api.js</button>
+            <div id="faceapi-results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Afficher les informations de l'environnement
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('protocol').textContent = window.location.protocol;
+        document.getElementById('is-electron').textContent = window.location.protocol === 'file:' ? 'OUI' : 'NON';
+
+        async function testProtocol() {
+            const results = document.getElementById('protocol-results');
+            results.innerHTML = '<p>🔄 Test en cours...</p>';
+            
+            try {
+                // Test du protocole personnalisé
+                const response = await fetch('models://tiny_face_detector/tiny_face_detector_model-weights_manifest.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    results.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Protocole models:// fonctionne !</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                results.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erreur avec models://</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testFileProtocol() {
+            const results = document.getElementById('protocol-results');
+            results.innerHTML = '<p>🔄 Test file:// en cours...</p>';
+            
+            try {
+                const response = await fetch('file:///C:/Users/Miracles%20Tech/Desktop/BORNE/build/models/tiny_face_detector/tiny_face_detector_model-weights_manifest.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    results.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Protocole file:// fonctionne !</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                results.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erreur avec file://</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testRelativePath() {
+            const results = document.getElementById('protocol-results');
+            results.innerHTML = '<p>🔄 Test chemin relatif en cours...</p>';
+            
+            try {
+                const response = await fetch('./models/tiny_face_detector/tiny_face_detector_model-weights_manifest.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    results.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Chemin relatif fonctionne !</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                results.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erreur avec chemin relatif</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testModelAccess() {
+            const results = document.getElementById('model-results');
+            results.innerHTML = '<p>🔄 Test d\'accès aux modèles en cours...</p>';
+            
+            const models = [
+                'tiny_face_detector/tiny_face_detector_model-weights_manifest.json',
+                'face_landmark_68/face_landmark_68_model-weights_manifest.json',
+                'face_recognition/face_recognition_model-weights_manifest.json',
+                'age_gender_model/age_gender_model-weights_manifest.json',
+                'face_expression/face_expression_model-weights_manifest.json'
+            ];
+
+            let successCount = 0;
+            let errorCount = 0;
+            let details = '';
+
+            for (const model of models) {
+                try {
+                    const isElectron = window.location.protocol === 'file:';
+                    const url = isElectron ? `models://${model}` : `./models/${model}`;
+                    
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        successCount++;
+                        details += `<div class="success">✅ ${model}</div>`;
+                    } else {
+                        errorCount++;
+                        details += `<div class="error">❌ ${model} - HTTP ${response.status}</div>`;
+                    }
+                } catch (error) {
+                    errorCount++;
+                    details += `<div class="error">❌ ${model} - ${error.message}</div>`;
+                }
+            }
+
+            results.innerHTML = `
+                <h4>📊 Résultats: ${successCount} succès, ${errorCount} erreurs</h4>
+                ${details}
+            `;
+        }
+
+        async function testFaceAPI() {
+            const results = document.getElementById('faceapi-results');
+            results.innerHTML = '<p>🔄 Test face-api.js en cours...</p>';
+            
+            try {
+                // Charger face-api.js depuis CDN
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js';
+                
+                script.onload = async () => {
+                    try {
+                        // Tester le chargement des modèles
+                        const isElectron = window.location.protocol === 'file:';
+                        const modelPath = isElectron ? 'models://' : './models';
+                        
+                        console.log('Chargement des modèles depuis:', modelPath);
+                        
+                        await faceapi.nets.tinyFaceDetector.loadFromUri(modelPath);
+                        await faceapi.nets.faceLandmark68Net.loadFromUri(modelPath);
+                        await faceapi.nets.faceRecognitionNet.loadFromUri(modelPath);
+                        
+                        results.innerHTML = `
+                            <div class="success">
+                                <h4>✅ Face-API.js fonctionne !</h4>
+                                <p>Modèles chargés avec succès depuis: ${modelPath}</p>
+                            </div>
+                        `;
+                    } catch (error) {
+                        results.innerHTML = `
+                            <div class="error">
+                                <h4>❌ Erreur lors du chargement des modèles</h4>
+                                <p>${error.message}</p>
+                            </div>
+                        `;
+                    }
+                };
+                
+                script.onerror = () => {
+                    results.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Erreur lors du chargement de face-api.js</h4>
+                        </div>
+                    `;
+                };
+                
+                document.head.appendChild(script);
+            } catch (error) {
+                results.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erreur lors du test</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 

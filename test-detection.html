@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Détection de Visages</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .container {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            background: #404040;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .result {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success { border-left: 4px solid #34C759; }
+        .warning { border-left: 4px solid #FF9500; }
+        .error { border-left: 4px solid #FF3B30; }
+        button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056CC; }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+        }
+        .face-box {
+            position: absolute;
+            border: 2px solid #34C759;
+            background: rgba(52, 199, 89, 0.1);
+            pointer-events: none;
+        }
+        .face-info {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #34C759;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .upload-area {
+            border: 2px dashed #404040;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #1a1a1a;
+            margin-bottom: 20px;
+        }
+        .upload-area:hover {
+            border-color: #007AFF;
+            background: #1a1a2a;
+        }
+        .upload-area.dragover {
+            border-color: #007AFF;
+            background: #1a1a2a;
+            transform: scale(1.02);
+        }
+        .analysis-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .info-item {
+            background: #1a1a1a;
+            padding: 8px;
+            border-radius: 5px;
+            border-left: 3px solid #007AFF;
+        }
+        .info-label {
+            font-size: 11px;
+            color: #b0b0b0;
+            margin-bottom: 2px;
+        }
+        .info-value {
+            font-weight: bold;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test Détection de Visages</h1>
+    
+    <div class="container">
+        <h2>📸 Upload d'Image</h2>
+        <div class="upload-area" id="upload-area">
+            <div style="font-size: 3rem; margin-bottom: 16px;">📷</div>
+            <p>Glissez-déposez une image ici ou cliquez pour sélectionner</p>
+            <input type="file" id="file-input" accept="image/*" style="display: none;">
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2>📊 Résultats de Détection</h2>
+        <div id="detection-results"></div>
+    </div>
+
+    <script>
+        // Simuler le service de détection de visages
+        class MockFaceDetectionService {
+            constructor() {
+                this.simulationMode = true;
+                this.minFaceSize = 20;
+                this.scaleFactor = 1.1;
+                this.detectionThreshold = 0.5;
+            }
+
+            async analyzeImageContent(imageElement) {
+                try {
+                    const imageWidth = imageElement.naturalWidth || imageElement.width;
+                    const imageHeight = imageElement.naturalHeight || imageElement.height;
+                    
+                    // Créer un canvas pour analyser le contenu
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = imageWidth;
+                    canvas.height = imageHeight;
+                    
+                    // Dessiner l'image sur le canvas
+                    ctx.drawImage(imageElement, 0, 0, imageWidth, imageHeight);
+                    
+                    // Analyser les données de pixels pour détecter des zones de peau
+                    const imageData = ctx.getImageData(0, 0, imageWidth, imageHeight);
+                    const data = imageData.data;
+                    
+                    // Analyser la luminosité et les couleurs pour estimer la présence de visages
+                    let skinTonePixels = 0;
+                    let brightPixels = 0;
+                    let totalPixels = imageWidth * imageHeight;
+                    
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i];
+                        const g = data[i + 1];
+                        const b = data[i + 2];
+                        
+                        // Détecter les tons de peau (approximation)
+                        if (r > g && r > b && g > b * 0.8 && r < 255 * 0.9) {
+                            skinTonePixels++;
+                        }
+                        
+                        // Détecter les pixels brillants
+                        if (r > 200 && g > 200 && b > 200) {
+                            brightPixels++;
+                        }
+                    }
+                    
+                    const skinToneRatio = skinTonePixels / totalPixels;
+                    const brightnessRatio = brightPixels / totalPixels;
+                    
+                    // Estimer le nombre de visages basé sur l'analyse
+                    let estimatedFaces = 0;
+                    if (skinToneRatio > 0.3) {
+                        estimatedFaces = Math.floor(skinToneRatio * 3) + 1;
+                    } else if (brightnessRatio > 0.4) {
+                        estimatedFaces = 1; // Probablement un visage clair
+                    } else {
+                        // Analyse basée sur la taille de l'image
+                        const imageArea = imageWidth * imageHeight;
+                        if (imageArea > 1000000) { // Grande image
+                            estimatedFaces = Math.random() > 0.5 ? 1 : 0;
+                        } else {
+                            estimatedFaces = Math.random() > 0.7 ? 1 : 0;
+                        }
+                    }
+                    
+                    // Limiter le nombre de visages détectés
+                    estimatedFaces = Math.min(estimatedFaces, 5);
+                    
+                    return {
+                        imageWidth,
+                        imageHeight,
+                        skinToneRatio,
+                        brightnessRatio,
+                        estimatedFaces,
+                        hasSkinTones: skinToneRatio > 0.1,
+                        isBright: brightnessRatio > 0.3,
+                        imageArea: imageWidth * imageHeight
+                    };
+                } catch (error) {
+                    console.warn('⚠️ Erreur lors de l\'analyse du contenu, utilisation de valeurs par défaut:', error);
+                    return {
+                        imageWidth: imageElement.naturalWidth || imageElement.width,
+                        imageHeight: imageElement.naturalHeight || imageElement.height,
+                        skinToneRatio: 0.2,
+                        brightnessRatio: 0.3,
+                        estimatedFaces: 1,
+                        hasSkinTones: true,
+                        isBright: false,
+                        imageArea: (imageElement.naturalWidth || imageElement.width) * (imageElement.naturalHeight || imageElement.height)
+                    };
+                }
+            }
+
+            calculateFacePosition(imageWidth, imageHeight, faceIndex, imageAnalysis) {
+                const centerX = imageWidth / 2;
+                const centerY = imageHeight / 2;
+                
+                // Calculer la taille du visage basée sur l'analyse
+                let faceWidth, faceHeight;
+                if (imageAnalysis.hasSkinTones) {
+                    faceWidth = Math.min(imageWidth * 0.3, 200);
+                    faceHeight = Math.min(imageHeight * 0.4, 250);
+                } else {
+                    faceWidth = Math.min(imageWidth * 0.25, 150);
+                    faceHeight = Math.min(imageHeight * 0.3, 180);
+                }
+                
+                // Positionner le visage de manière réaliste
+                let x, y;
+                if (faceIndex === 0) {
+                    // Premier visage au centre ou légèrement décalé
+                    x = centerX - faceWidth / 2 + (Math.random() - 0.5) * 50;
+                    y = centerY - faceHeight / 2 + (Math.random() - 0.5) * 30;
+                } else {
+                    // Visages supplémentaires dans différentes zones
+                    const zones = [
+                        { x: centerX * 0.3, y: centerY * 0.3 },
+                        { x: centerX * 1.7, y: centerY * 0.3 },
+                        { x: centerX * 0.3, y: centerY * 1.7 },
+                        { x: centerX * 1.7, y: centerY * 1.7 }
+                    ];
+                    const zone = zones[faceIndex - 1] || zones[0];
+                    x = zone.x - faceWidth / 2 + (Math.random() - 0.5) * 30;
+                    y = zone.y - faceHeight / 2 + (Math.random() - 0.5) * 20;
+                }
+                
+                // S'assurer que le visage reste dans l'image
+                x = Math.max(0, Math.min(x, imageWidth - faceWidth));
+                y = Math.max(0, Math.min(y, imageHeight - faceHeight));
+                
+                // Calculer la confiance basée sur l'analyse
+                let confidence = 0.8;
+                if (imageAnalysis.hasSkinTones) confidence += 0.1;
+                if (imageAnalysis.isBright) confidence += 0.05;
+                if (faceWidth > 100) confidence += 0.05;
+                
+                confidence = Math.min(0.95, confidence + Math.random() * 0.1);
+                
+                return {
+                    box: { x: Math.round(x), y: Math.round(y), width: Math.round(faceWidth), height: Math.round(faceHeight) },
+                    confidence: confidence
+                };
+            }
+
+            generateDescriptor(imageAnalysis, faceIndex) {
+                const descriptor = [];
+                
+                // Utiliser les caractéristiques de l'image pour générer un descripteur cohérent
+                const seed = imageAnalysis.skinToneRatio * 1000 + 
+                             imageAnalysis.brightnessRatio * 100 + 
+                             imageAnalysis.imageArea / 10000 + 
+                             faceIndex * 100;
+                
+                for (let i = 0; i < 128; i++) {
+                    // Générer des valeurs cohérentes basées sur le seed
+                    const randomValue = Math.sin(seed + i * 0.1) * 0.5 + 0.5;
+                    descriptor.push(Math.max(0, Math.min(1, randomValue)));
+                }
+                
+                return descriptor;
+            }
+
+            async detectFaces(imageElement) {
+                try {
+                    console.log('🔍 Détection simulée de visages...');
+                    
+                    // Simuler un délai de détection
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    // Analyser la taille de l'image pour adapter la détection
+                    const imageWidth = imageElement.naturalWidth || imageElement.width;
+                    const imageHeight = imageElement.naturalHeight || imageElement.height;
+                    
+                    console.log(`📏 Taille de l'image: ${imageWidth}x${imageHeight} pixels`);
+                    
+                    // Analyser le contenu de l'image pour une détection plus réaliste
+                    const imageAnalysis = await this.analyzeImageContent(imageElement);
+                    
+                    // Détecter si c'est une image de faible résolution
+                    const isLowResolution = imageWidth < 800 || imageHeight < 600;
+                    const isVeryLowResolution = imageWidth < 400 || imageHeight < 300;
+                    
+                    if (isLowResolution) {
+                        console.log('⚠️ Image de faible résolution détectée - Ajustement des paramètres de détection');
+                    }
+                    
+                    if (isVeryLowResolution) {
+                        console.log('⚠️ Image de très faible résolution - Détection optimisée pour petits visages');
+                    }
+                    
+                    // Générer des détections basées sur l'analyse du contenu
+                    const detections = [];
+                    
+                    // Détecter des visages basés sur l'analyse du contenu
+                    for (let i = 0; i < imageAnalysis.estimatedFaces; i++) {
+                        const facePosition = this.calculateFacePosition(imageWidth, imageHeight, i, imageAnalysis);
+                        
+                        const detection = {
+                            detection: {
+                                box: facePosition.box,
+                                score: facePosition.confidence
+                            },
+                            landmarks: { positions: Array(68).fill().map(() => ({ x: 0, y: 0 })) },
+                            descriptor: this.generateDescriptor(imageAnalysis, i),
+                            age: Math.floor(Math.random() * 50) + 20,
+                            gender: Math.random() > 0.5 ? 'male' : 'female',
+                            expressions: {
+                                neutral: Math.random() * 0.8 + 0.2,
+                                happy: Math.random() * 0.6,
+                                sad: Math.random() * 0.4,
+                                angry: Math.random() * 0.3,
+                                fearful: Math.random() * 0.2,
+                                disgusted: Math.random() * 0.2,
+                                surprised: Math.random() * 0.3
+                            },
+                            quality: {
+                                resolution: isLowResolution ? 'low' : 'normal',
+                                faceSize: facePosition.box.width < 100 ? 'small' : 'normal',
+                                confidence: facePosition.confidence,
+                                detectionMethod: isLowResolution ? 'optimized_small_faces' : 'standard',
+                                imageAnalysis: imageAnalysis
+                            }
+                        };
+                        
+                        detections.push(detection);
+                        
+                        console.log(`✅ Visage ${i + 1} détecté avec confiance: ${(detection.detection.score * 100).toFixed(1)}%`);
+                        console.log(`📊 Position: x=${detection.detection.box.x}, y=${detection.detection.box.y}, w=${detection.detection.box.width}, h=${detection.detection.box.height}`);
+                    }
+                    
+                    console.log(`📊 Qualité: ${isLowResolution ? 'low' : 'normal'} résolution, ${detections.length} visage(s) détecté(s)`);
+                    
+                    return detections;
+                } catch (error) {
+                    console.error('❌ Erreur lors de la détection des visages:', error);
+                    return [];
+                }
+            }
+        }
+
+        // Créer une instance du service
+        const faceDetectionService = new MockFaceDetectionService();
+
+        // Fonction pour gérer l'upload d'image
+        function handleImageUpload(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    detectFaces(img);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Fonction pour détecter les visages
+        async function detectFaces(imageElement) {
+            const resultsDiv = document.getElementById('detection-results');
+            resultsDiv.innerHTML = '<div class="result">🔍 Analyse en cours...</div>';
+            
+            try {
+                const detections = await faceDetectionService.detectFaces(imageElement);
+                
+                // Afficher l'image avec les boîtes de détection
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'image-container';
+                imageContainer.style.position = 'relative';
+                imageContainer.style.display = 'inline-block';
+                
+                const img = document.createElement('img');
+                img.src = imageElement.src;
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+                imageContainer.appendChild(img);
+                
+                // Ajouter les boîtes de détection
+                detections.forEach((detection, index) => {
+                    const box = detection.detection.box;
+                    const faceBox = document.createElement('div');
+                    faceBox.className = 'face-box';
+                    faceBox.style.left = (box.x / imageElement.naturalWidth * 100) + '%';
+                    faceBox.style.top = (box.y / imageElement.naturalHeight * 100) + '%';
+                    faceBox.style.width = (box.width / imageElement.naturalWidth * 100) + '%';
+                    faceBox.style.height = (box.height / imageElement.naturalHeight * 100) + '%';
+                    
+                    const faceInfo = document.createElement('div');
+                    faceInfo.className = 'face-info';
+                    faceInfo.textContent = `Visage ${index + 1}: ${(detection.detection.score * 100).toFixed(1)}%`;
+                    faceBox.appendChild(faceInfo);
+                    
+                    imageContainer.appendChild(faceBox);
+                });
+                
+                // Afficher les résultats
+                resultsDiv.innerHTML = `
+                    <div class="result success">
+                        ✅ Détection terminée: ${detections.length} visage(s) trouvé(s)
+                    </div>
+                    <div class="test-section">
+                        <h3>📸 Image avec Détections</h3>
+                        ${imageContainer.outerHTML}
+                    </div>
+                    <div class="test-section">
+                        <h3>📊 Détails des Détections</h3>
+                        ${detections.map((detection, index) => `
+                            <div class="result success">
+                                <strong>Visage ${index + 1}:</strong><br>
+                                Position: x=${detection.detection.box.x}, y=${detection.detection.box.y}<br>
+                                Taille: ${detection.detection.box.width}x${detection.detection.box.height} pixels<br>
+                                Confiance: ${(detection.detection.score * 100).toFixed(1)}%<br>
+                                Âge estimé: ${detection.age} ans<br>
+                                Genre: ${detection.gender}<br>
+                                Qualité: ${detection.quality.resolution} résolution, ${detection.quality.faceSize} visage
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="test-section">
+                        <h3>🔍 Analyse du Contenu</h3>
+                        <div class="analysis-info">
+                            <div class="info-item">
+                                <div class="info-label">Taille de l'image</div>
+                                <div class="info-value">${detections[0]?.quality.imageAnalysis.imageWidth || 0} x ${detections[0]?.quality.imageAnalysis.imageHeight || 0} pixels</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Ratio tons de peau</div>
+                                <div class="info-value">${((detections[0]?.quality.imageAnalysis.skinToneRatio || 0) * 100).toFixed(1)}%</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Ratio luminosité</div>
+                                <div class="info-value">${((detections[0]?.quality.imageAnalysis.brightnessRatio || 0) * 100).toFixed(1)}%</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Visages détectés</div>
+                                <div class="info-value">${detections.length}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="result error">❌ Erreur: ${error.message}</div>`;
+            }
+        }
+
+        // Initialiser les événements
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+            
+            // Gestion du drag & drop
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleImageUpload(files[0]);
+                }
+            });
+            
+            // Gestion du clic
+            uploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleImageUpload(e.target.files[0]);
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

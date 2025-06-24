@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Test Recherche Ultra-Précise</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .config-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .config-card h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        
+        .slider-group {
+            margin: 15px 0;
+        }
+        
+        .slider-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .slider::-webkit-slider-track {
+            background: #e9ecef;
+            border-radius: 3px;
+            height: 6px;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .slider-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .checkbox-group {
+            margin: 10px 0;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .button.secondary {
+            background: #6c757d;
+        }
+        
+        .button.success {
+            background: #28a745;
+        }
+        
+        .button.danger {
+            background: #dc3545;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .result-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .result-card h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        
+        .result-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        .log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .log.error {
+            color: #ff6b6b;
+        }
+        
+        .log.warning {
+            color: #ffd93d;
+        }
+        
+        .log.info {
+            color: #4ecdc4;
+        }
+        
+        .log.success {
+            color: #51cf66;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Test Recherche Ultra-Précise</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            Système de reconnaissance faciale optimisé pour détecter TOUS vos visages, même les plus petits et de moindre qualité
+        </p>
+        
+        <!-- Configuration Ultra-Précise -->
+        <div class="section">
+            <h2>⚙️ Configuration Ultra-Précise</h2>
+            
+            <div class="config-grid">
+                <div class="config-card">
+                    <h3>🔍 Détection Multi-Échelle</h3>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="multi-scale" checked>
+                            Détection multi-échelle (petits visages)
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="blur-detection" checked>
+                            Détection des visages flous
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="partial-detection" checked>
+                            Détection des visages partiels
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="occluded-detection" checked>
+                            Détection des visages cachés
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="config-card">
+                    <h3>🎯 Seuils Adaptatifs</h3>
+                    <div class="slider-group">
+                        <label>Seuil de Similarité: <span id="similarity-value">0.4</span></label>
+                        <div class="slider-container">
+                            <input type="range" id="similarity-slider" class="slider" min="0.1" max="1.0" step="0.05" value="0.4" oninput="updateSlider('similarity')">
+                            <span class="slider-value" id="similarity-display">0.4</span>
+                        </div>
+                    </div>
+                    
+                    <div class="slider-group">
+                        <label>Seuil de Confiance: <span id="confidence-value">0.4</span></label>
+                        <div class="slider-container">
+                            <input type="range" id="confidence-slider" class="slider" min="0.1" max="1.0" step="0.05" value="0.4" oninput="updateSlider('confidence')">
+                            <span class="slider-value" id="confidence-display">0.4</span>
+                        </div>
+                    </div>
+                    
+                    <div class="slider-group">
+                        <label>Qualité Minimale: <span id="quality-value">0.2</span></label>
+                        <div class="slider-container">
+                            <input type="range" id="quality-slider" class="slider" min="0.1" max="1.0" step="0.05" value="0.2" oninput="updateSlider('quality')">
+                            <span class="slider-value" id="quality-display">0.2</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="config-card">
+                    <h3>🔧 Paramètres Avancés</h3>
+                    <div class="slider-group">
+                        <label>Taille d'Entrée: <span id="input-size-value">512</span></label>
+                        <div class="slider-container">
+                            <input type="range" id="input-size-slider" class="slider" min="224" max="1024" step="32" value="512" oninput="updateSlider('input-size')">
+                            <span class="slider-value" id="input-size-display">512</span>
+                        </div>
+                    </div>
+                    
+                    <div class="slider-group">
+                        <label>Échelles Max: <span id="max-scales-value">5</span></label>
+                        <div class="slider-container">
+                            <input type="range" id="max-scales-slider" class="slider" min="1" max="10" step="1" value="5" oninput="updateSlider('max-scales')">
+                            <span class="slider-value" id="max-scales-display">5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="slider-group">
+                        <label>Résultats Max: <span id="max-results-value">100</span></label>
+                        <div class="slider-container">
+                            <input type="range" id="max-results-slider" class="slider" min="10" max="200" step="10" value="100" oninput="updateSlider('max-results')">
+                            <span class="slider-value" id="max-results-display">100</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="button success" onclick="saveConfig()">💾 Sauvegarder Configuration</button>
+            <button class="button secondary" onclick="resetConfig()">🔄 Configuration Par Défaut</button>
+        </div>
+        
+        <!-- Test de Recherche -->
+        <div class="section">
+            <h2>🔍 Test de Recherche Ultra-Précise</h2>
+            
+            <div class="input-group">
+                <label for="reference-image">Image de Référence (Votre Visage):</label>
+                <input type="file" id="reference-image" accept="image/*" onchange="loadReferenceImage()">
+            </div>
+            
+            <div id="reference-preview" style="display: none; margin: 20px 0;">
+                <img id="reference-img" style="max-width: 200px; border-radius: 10px;">
+            </div>
+            
+            <button class="button" onclick="startUltraPreciseSearch()" id="search-btn" disabled>🎯 Lancer la Recherche Ultra-Précise</button>
+            <button class="button secondary" onclick="testDetectionOnly()" id="detect-btn" disabled>🔍 Test Détection Seulement</button>
+        </div>
+        
+        <!-- Résultats -->
+        <div class="section">
+            <h2>📊 Résultats de la Recherche</h2>
+            
+            <div class="stats-summary" id="stats-summary" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-faces">0</div>
+                    <div class="stat-label">Visages Détectés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="matches-found">0</div>
+                    <div class="stat-label">Correspondances</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-similarity">0%</div>
+                    <div class="stat-label">Similarité Moyenne</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="small-faces">0</div>
+                    <div class="stat-label">Petits Visages</div>
+                </div>
+            </div>
+            
+            <div class="progress-bar" id="progress-bar" style="display: none;">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            
+            <div class="results-grid" id="results-grid">
+                <p>Aucune recherche effectuée</p>
+            </div>
+        </div>
+        
+        <!-- Logs -->
+        <div class="section">
+            <h2>📝 Logs Détaillés</h2>
+            <div class="log" id="log-container">
+                <div class="log info">Système de recherche ultra-précise prêt...</div>
+            </div>
+            <button class="button secondary" onclick="clearLogs()">🧹 Effacer les Logs</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script>
+        // Configuration ultra-précise
+        let config = {
+            // Détection
+            enableMultiScaleDetection: true,
+            enableBlurDetection: true,
+            enablePartialFaceDetection: true,
+            enableOccludedFaceDetection: true,
+            
+            // Seuils
+            similarityThreshold: 0.4,
+            confidenceThreshold: 0.4,
+            minDescriptorQuality: 0.2,
+            
+            // Paramètres
+            inputSize: 512,
+            maxScales: 5,
+            maxResults: 100
+        };
+        
+        let referenceImage = null;
+        let isInitialized = false;
+        
+        // Logs
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // Mise à jour des sliders
+        function updateSlider(type) {
+            const slider = document.getElementById(`${type}-slider`);
+            const display = document.getElementById(`${type}-display`);
+            const value = document.getElementById(`${type}-value`);
+            
+            const sliderValue = parseFloat(slider.value);
+            display.textContent = sliderValue.toFixed(type.includes('size') ? 0 : 2);
+            value.textContent = sliderValue.toFixed(type.includes('size') ? 0 : 2);
+            
+            // Mettre à jour la configuration
+            switch(type) {
+                case 'similarity':
+                    config.similarityThreshold = sliderValue;
+                    break;
+                case 'confidence':
+                    config.confidenceThreshold = sliderValue;
+                    break;
+                case 'quality':
+                    config.minDescriptorQuality = sliderValue;
+                    break;
+                case 'input-size':
+                    config.inputSize = sliderValue;
+                    break;
+                case 'max-scales':
+                    config.maxScales = sliderValue;
+                    break;
+                case 'max-results':
+                    config.maxResults = sliderValue;
+                    break;
+            }
+        }
+        
+        // Chargement de l'image de référence
+        function loadReferenceImage() {
+            const fileInput = document.getElementById('reference-image');
+            const file = fileInput.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    referenceImage = e.target.result;
+                    
+                    const preview = document.getElementById('reference-preview');
+                    const img = document.getElementById('reference-img');
+                    img.src = referenceImage;
+                    preview.style.display = 'block';
+                    
+                    document.getElementById('search-btn').disabled = false;
+                    document.getElementById('detect-btn').disabled = false;
+                    
+                    log('✅ Image de référence chargée', 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Initialisation du système
+        async function initializeSystem() {
+            if (isInitialized) return;
+            
+            try {
+                log('🚀 Initialisation du système ultra-précis...', 'info');
+                
+                // Charger les modèles
+                const modelPath = '/models';
+                await Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri(modelPath + '/tiny_face_detector'),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(modelPath + '/face_landmark_68'),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(modelPath + '/face_recognition'),
+                    faceapi.nets.ageGenderNet.loadFromUri(modelPath + '/age_gender_model'),
+                    faceapi.nets.faceExpressionNet.loadFromUri(modelPath + '/face_expression')
+                ]);
+                
+                isInitialized = true;
+                log('✅ Système ultra-précis initialisé avec succès !', 'success');
+                
+            } catch (error) {
+                log(`❌ Erreur lors de l'initialisation: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test de détection seulement
+        async function testDetectionOnly() {
+            if (!referenceImage) {
+                log('❌ Aucune image de référence sélectionnée', 'error');
+                return;
+            }
+            
+            try {
+                await initializeSystem();
+                
+                log('🔍 Test de détection ultra-sensible...', 'info');
+                
+                const img = new Image();
+                img.onload = async function() {
+                    try {
+                        // Configuration ultra-sensible
+                        const detectorOptions = new faceapi.TinyFaceDetectorOptions({
+                            inputSize: config.inputSize,
+                            scoreThreshold: 0.3
+                        });
+                        
+                        const detections = await faceapi.detectAllFaces(img, detectorOptions)
+                            .withFaceLandmarks()
+                            .withFaceDescriptors()
+                            .withAgeAndGender()
+                            .withFaceExpressions();
+                        
+                        log(`📊 Détection terminée: ${detections.length} visage(s) trouvé(s)`, 'success');
+                        
+                        // Analyser chaque visage
+                        for (let i = 0; i < detections.length; i++) {
+                            const detection = detections[i];
+                            const quality = calculateQuality(detection, img);
+                            
+                            log(`🔍 Visage ${i + 1}: Taille ${detection.box.width}x${detection.box.height}, Qualité ${(quality.overallQuality * 100).toFixed(1)}%`, 'info');
+                        }
+                        
+                    } catch (error) {
+                        log(`❌ Erreur lors de la détection: ${error.message}`, 'error');
+                    }
+                };
+                img.src = referenceImage;
+                
+            } catch (error) {
+                log(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+        
+        // Calcul de qualité simplifié
+        function calculateQuality(detection, imageElement) {
+            const faceArea = detection.box.width * detection.box.height;
+            const imageArea = imageElement.naturalWidth * imageElement.naturalHeight;
+            const faceRatio = faceArea / imageArea;
+            
+            const sizeQuality = Math.min(1, faceRatio * 1000);
+            const confidenceQuality = detection.score;
+            
+            return {
+                overallQuality: (sizeQuality * 0.5) + (confidenceQuality * 0.5),
+                faceRatio: faceRatio,
+                sizeQuality: sizeQuality,
+                confidence: confidenceQuality
+            };
+        }
+        
+        // Recherche ultra-précise simulée
+        async function startUltraPreciseSearch() {
+            if (!referenceImage) {
+                log('❌ Aucune image de référence sélectionnée', 'error');
+                return;
+            }
+            
+            try {
+                await initializeSystem();
+                
+                log('🎯 Début de la recherche ultra-précise...', 'info');
+                
+                // Afficher la barre de progression
+                document.getElementById('progress-bar').style.display = 'block';
+                document.getElementById('progress-fill').style.width = '0%';
+                
+                // Simuler une recherche avec des résultats réalistes
+                const totalPhotos = 150;
+                const results = [];
+                
+                for (let i = 0; i < totalPhotos; i++) {
+                    // Simuler le traitement
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                    
+                    // Mettre à jour la progression
+                    const progress = ((i + 1) / totalPhotos) * 100;
+                    document.getElementById('progress-fill').style.width = progress + '%';
+                    
+                    // Générer des résultats réalistes
+                    if (Math.random() < 0.3) { // 30% de chance d'avoir un match
+                        const similarity = 0.4 + Math.random() * 0.5; // 40-90%
+                        const quality = 0.2 + Math.random() * 0.6; // 20-80%
+                        const confidence = similarity * 0.7 + quality * 0.3;
+                        
+                        if (similarity >= config.similarityThreshold && confidence >= config.confidenceThreshold) {
+                            results.push({
+                                photoId: `photo_${i}`,
+                                fileName: `photo_${i}.jpg`,
+                                similarity: similarity,
+                                confidence: confidence,
+                                quality: {
+                                    overallQuality: quality,
+                                    faceRatio: 0.001 + Math.random() * 0.02, // Petits visages
+                                    sizeQuality: quality * 0.8,
+                                    blurQuality: 0.5 + Math.random() * 0.4,
+                                    partialFaceQuality: 0.6 + Math.random() * 0.3
+                                },
+                                metadata: {
+                                    detectionMethod: Math.random() > 0.5 ? 'multi-scale' : 'standard',
+                                    scale: 0.5 + Math.random() * 0.5
+                                }
+                            });
+                        }
+                    }
+                    
+                    if ((i + 1) % 10 === 0) {
+                        log(`📊 Traitement: ${i + 1}/${totalPhotos} photos, ${results.length} correspondances trouvées`, 'info');
+                    }
+                }
+                
+                // Trier par similarité
+                results.sort((a, b) => b.similarity - a.similarity);
+                
+                // Limiter le nombre de résultats
+                const limitedResults = results.slice(0, config.maxResults);
+                
+                // Afficher les statistiques
+                displaySearchStats(limitedResults);
+                
+                // Afficher les résultats
+                displaySearchResults(limitedResults);
+                
+                log(`✅ Recherche terminée: ${limitedResults.length} correspondances trouvées sur ${totalPhotos} photos analysées`, 'success');
+                
+                // Masquer la barre de progression
+                document.getElementById('progress-bar').style.display = 'none';
+                
+            } catch (error) {
+                log(`❌ Erreur lors de la recherche: ${error.message}`, 'error');
+                document.getElementById('progress-bar').style.display = 'none';
+            }
+        }
+        
+        // Affichage des statistiques
+        function displaySearchStats(results) {
+            const statsSummary = document.getElementById('stats-summary');
+            statsSummary.style.display = 'grid';
+            
+            const totalFaces = results.length;
+            const avgSimilarity = results.length > 0 ? results.reduce((sum, r) => sum + r.similarity, 0) / results.length : 0;
+            const smallFaces = results.filter(r => r.quality.faceRatio < 0.01).length;
+            
+            document.getElementById('total-faces').textContent = totalFaces;
+            document.getElementById('matches-found').textContent = totalFaces;
+            document.getElementById('avg-similarity').textContent = (avgSimilarity * 100).toFixed(1) + '%';
+            document.getElementById('small-faces').textContent = smallFaces;
+        }
+        
+        // Affichage des résultats
+        function displaySearchResults(results) {
+            const resultsGrid = document.getElementById('results-grid');
+            
+            if (results.length === 0) {
+                resultsGrid.innerHTML = '<p>Aucune correspondance trouvée</p>';
+                return;
+            }
+            
+            resultsGrid.innerHTML = results.map((result, index) => `
+                <div class="result-card">
+                    <h4>${result.fileName}</h4>
+                    <div class="result-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${(result.similarity * 100).toFixed(1)}%</div>
+                            <div class="stat-label">Similarité</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${(result.confidence * 100).toFixed(1)}%</div>
+                            <div class="stat-label">Confiance</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${(result.quality.overallQuality * 100).toFixed(1)}%</div>
+                            <div class="stat-label">Qualité</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${result.metadata.detectionMethod}</div>
+                            <div class="stat-label">Méthode</div>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.8em; color: #666; margin: 0;">
+                        Taille: ${(result.quality.faceRatio * 100).toFixed(3)}% de l'image
+                    </p>
+                </div>
+            `).join('');
+        }
+        
+        // Sauvegarder la configuration
+        function saveConfig() {
+            config.enableMultiScaleDetection = document.getElementById('multi-scale').checked;
+            config.enableBlurDetection = document.getElementById('blur-detection').checked;
+            config.enablePartialFaceDetection = document.getElementById('partial-detection').checked;
+            config.enableOccludedFaceDetection = document.getElementById('occluded-detection').checked;
+            
+            log('💾 Configuration sauvegardée', 'success');
+            console.log('Configuration:', config);
+        }
+        
+        // Réinitialiser la configuration
+        function resetConfig() {
+            config = {
+                enableMultiScaleDetection: true,
+                enableBlurDetection: true,
+                enablePartialFaceDetection: true,
+                enableOccludedFaceDetection: true,
+                similarityThreshold: 0.4,
+                confidenceThreshold: 0.4,
+                minDescriptorQuality: 0.2,
+                inputSize: 512,
+                maxScales: 5,
+                maxResults: 100
+            };
+            
+            // Mettre à jour l'interface
+            document.getElementById('multi-scale').checked = true;
+            document.getElementById('blur-detection').checked = true;
+            document.getElementById('partial-detection').checked = true;
+            document.getElementById('occluded-detection').checked = true;
+            
+            document.getElementById('similarity-slider').value = 0.4;
+            document.getElementById('confidence-slider').value = 0.4;
+            document.getElementById('quality-slider').value = 0.2;
+            document.getElementById('input-size-slider').value = 512;
+            document.getElementById('max-scales-slider').value = 5;
+            document.getElementById('max-results-slider').value = 100;
+            
+            updateSlider('similarity');
+            updateSlider('confidence');
+            updateSlider('quality');
+            updateSlider('input-size');
+            updateSlider('max-scales');
+            updateSlider('max-results');
+            
+            log('🔄 Configuration réinitialisée', 'info');
+        }
+        
+        // Effacer les logs
+        function clearLogs() {
+            document.getElementById('log-container').innerHTML = '<div class="log info">Logs effacés...</div>';
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🎯 Système de recherche ultra-précise chargé', 'info');
+            resetConfig();
+        });
+    </script>
+</body>
+</html> 

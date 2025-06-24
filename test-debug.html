@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Debug - Application Photo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 50%, #16213E 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #4ECDC4;
+            margin-bottom: 30px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: linear-gradient(135deg, #FF6B9D, #4ECDC4);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        button.danger {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+        }
+        button.success {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+        }
+        .status {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #4ECDC4;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .error {
+            border-left-color: #FF6B6B;
+            color: #FF6B6B;
+        }
+        .success {
+            border-left-color: #4ECDC4;
+            color: #4ECDC4;
+        }
+        .warning {
+            border-left-color: #FFD93D;
+            color: #FFD93D;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug - Application Photo</h1>
+        
+        <div class="status">
+            <h3>État actuel de l'application :</h3>
+            <div id="appStatus">Chargement...</div>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="checkStatus()">🔍 Vérifier l'état</button>
+            <button onclick="testInit()">🧪 Tester l'initialisation</button>
+            <button onclick="forceInit()">⚡ Forcer l'initialisation</button>
+            <button class="danger" onclick="disableServices()">🚫 Désactiver les services</button>
+            <button class="success" onclick="enableServices()">✅ Réactiver les services</button>
+            <button onclick="clearLog()">🗑️ Effacer les logs</button>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="analyzeAll()">🔍 Analyser toutes les photos</button>
+            <button onclick="stopAll()">⏹️ Arrêter toutes les analyses</button>
+            <button onclick="testStoreFunctions()">🧪 Tester les fonctions du store</button>
+            <button onclick="diagnoseProblem()">🔍 Diagnostic du problème</button>
+            <button onclick="testAutoInit()">🚀 Tester l'init automatique</button>
+            <button onclick="testIntelligentInit()">🧠 Tester l'init intelligente</button>
+            <button onclick="openApp()">🚀 Ouvrir l'application</button>
+            <button onclick="openSearch()">🔍 Ouvrir la page recherche</button>
+            <button onclick="reloadApp()">🔄 Recharger l'application</button>
+        </div>
+        
+        <div class="log" id="log">
+            === Démarrage du debug ===
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            logElement.textContent += `\n[${timestamp}] ${prefix} ${message}`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '=== Logs effacés ===';
+        }
+
+        function updateStatus(status) {
+            const statusElement = document.getElementById('appStatus');
+            statusElement.innerHTML = `
+                <strong>Services IA:</strong> ${status.store.isInitialized ? '✅ Initialisés' : status.store.isLoading ? '⏳ En cours...' : '❌ Non initialisés'}<br>
+                <strong>Erreur:</strong> ${status.store.error || 'Aucune'}<br>
+                <strong>Service de détection:</strong> ${status.detectionService ? '✅ Prêt' : '❌ Non disponible'}<br>
+                <strong>Service de reconnaissance:</strong> ${status.recognitionService ? '✅ Prêt' : '❌ Non disponible'}
+            `;
+        }
+
+        async function checkStatus() {
+            try {
+                log('Vérification de l\'état des services...');
+                if (window.debugFaceServices) {
+                    const status = window.debugFaceServices.checkStatus();
+                    updateStatus(status);
+                    log('État vérifié avec succès', 'success');
+                } else {
+                    log('Services de debug non disponibles', 'error');
+                }
+            } catch (error) {
+                log(`Erreur lors de la vérification: ${error.message}`, 'error');
+            }
+        }
+
+        async function testInit() {
+            try {
+                log('Test d\'initialisation des services...');
+                if (window.debugFaceServices) {
+                    const result = await window.debugFaceServices.testInit();
+                    log(`Résultat du test: ${JSON.stringify(result)}`, 'success');
+                    checkStatus();
+                } else {
+                    log('Services de debug non disponibles', 'error');
+                }
+            } catch (error) {
+                log(`Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+
+        async function forceInit() {
+            try {
+                log('Force de l\'initialisation des services...');
+                if (window.debugFaceServices) {
+                    const result = await window.debugFaceServices.forceInit();
+                    log(`Résultat de la force: ${JSON.stringify(result)}`, 'success');
+                    checkStatus();
+                } else {
+                    log('Services de debug non disponibles', 'error');
+                }
+            } catch (error) {
+                log(`Erreur lors de la force: ${error.message}`, 'error');
+            }
+        }
+
+        function disableServices() {
+            try {
+                log('Désactivation des services...');
+                if (window.debugFaceServices) {
+                    const result = window.debugFaceServices.disable();
+                    log(`Services désactivés: ${JSON.stringify(result)}`, 'success');
+                    checkStatus();
+                } else {
+                    log('Services de debug non disponibles', 'error');
+                }
+            } catch (error) {
+                log(`Erreur lors de la désactivation: ${error.message}`, 'error');
+            }
+        }
+
+        function enableServices() {
+            try {
+                log('Réactivation des services...');
+                if (window.debugFaceServices) {
+                    const result = window.debugFaceServices.enable();
+                    log(`Services réactivés: ${JSON.stringify(result)}`, 'success');
+                    checkStatus();
+                } else {
+                    log('Services de debug non disponibles', 'error');
+                }
+            } catch (error) {
+                log(`Erreur lors de la réactivation: ${error.message}`, 'error');
+            }
+        }
+
+        function analyzeAll() {
+            try {
+                log('Analyse de toutes les photos en attente...');
+                if (window.debugFaceServices) {
+                    window.debugFaceServices.analyzeAll().then(result => {
+                        log(`Analyse lancée: ${JSON.stringify(result)}`, 'success');
+                        checkStatus();
+                    }).catch(error => {
+                        log(`Erreur lors de l'analyse: ${error.message}`, 'error');
+                    });
+                } else {
+                    log('Services de debug non disponibles', 'error');
+                }
+            } catch (error) {
+                log(`Erreur lors de l'analyse: ${error.message}`, 'error');
+            }
+        }
+
+        function stopAll() {
+            try {
+                log('Arrêt de toutes les analyses...');
+                if (window.debugFaceServices) {
+                    const result = window.debugFaceServices.stopAll();
+                    log(`Analyses arrêtées: ${JSON.stringify(result)}`, 'success');
+                    checkStatus();
+                } else {
+                    log('Services de debug non disponibles', 'error');
+                }
+            } catch (error) {
+                log(`Erreur lors de l'arrêt: ${error.message}`, 'error');
+            }
+        }
+
+        function testStoreFunctions() {
+            try {
+                log('Test des fonctions du store...');
+                if (window.debugFaceServices) {
+                    const result = window.debugFaceServices.testStoreFunctions();
+                    log(`Résultat du test: ${JSON.stringify(result)}`, 'success');
+                    checkStatus();
+                } else {
+                    log('Services de debug non disponibles', 'error');
+                }
+            } catch (error) {
+                log(`Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+
+        function diagnoseProblem() {
+            try {
+                log('🔍 Diagnostic du problème...');
+                
+                // Test 1: Vérifier si l'application est chargée
+                if (typeof window !== 'undefined') {
+                    log('✅ Window disponible', 'success');
+                } else {
+                    log('❌ Window non disponible', 'error');
+                    return;
+                }
+                
+                // Test 2: Vérifier si le store est chargé
+                if (window.debugFaceServices) {
+                    log('✅ Services de debug disponibles', 'success');
+                } else {
+                    log('❌ Services de debug non disponibles', 'error');
+                    log('L\'application n\'est peut-être pas chargée', 'warning');
+                    return;
+                }
+                
+                // Test 3: Vérifier les fonctions individuelles
+                const tests = [
+                    { name: 'getState', func: () => window.debugFaceServices.getState() },
+                    { name: 'checkStatus', func: () => window.debugFaceServices.checkStatus() },
+                    { name: 'disable', func: () => window.debugFaceServices.disable() },
+                    { name: 'enable', func: () => window.debugFaceServices.enable() }
+                ];
+                
+                tests.forEach(test => {
+                    try {
+                        const result = test.func();
+                        log(`✅ ${test.name}: Fonctionne`, 'success');
+                    } catch (error) {
+                        log(`❌ ${test.name}: Erreur - ${error.message}`, 'error');
+                    }
+                });
+                
+            } catch (error) {
+                log(`Erreur lors du diagnostic: ${error.message}`, 'error');
+            }
+        }
+
+        function openApp() {
+            log('Ouverture de l\'application...');
+            window.open('http://localhost:3000', '_blank');
+        }
+
+        function openSearch() {
+            log('Ouverture de la page de recherche...');
+            window.open('http://localhost:3000/#/face-search', '_blank');
+        }
+
+        function reloadApp() {
+            log('Rechargement de l\'application...');
+            if (window.opener) {
+                window.opener.location.reload();
+            } else {
+                window.location.reload();
+            }
+        }
+
+        function testAutoInit() {
+            try {
+                log('Test de l\'initialisation intelligente...');
+                if (window.debugFaceServices) {
+                    // Désactiver d'abord pour simuler un état non initialisé
+                    window.debugFaceServices.disable();
+                    log('Services désactivés pour le test', 'success');
+                    
+                    // Attendre un peu puis vérifier
+                    setTimeout(() => {
+                        const status = window.debugFaceServices.checkStatus();
+                        log(`État après désactivation: ${JSON.stringify(status)}`, 'info');
+                        
+                        // Maintenant forcer l'initialisation
+                        window.debugFaceServices.forceInit().then(result => {
+                            log(`Initialisation forcée: ${JSON.stringify(result)}`, 'success');
+                            
+                            // Vérifier l'état final
+                            setTimeout(() => {
+                                const finalStatus = window.debugFaceServices.checkStatus();
+                                log(`État final: ${JSON.stringify(finalStatus)}`, 'success');
+                            }, 1000);
+                        }).catch(error => {
+                            log(`Erreur lors de l'init: ${error.message}`, 'error');
+                        });
+                    }, 500);
+                    
+                } else {
+                    log('Services de debug non disponibles', 'error');
+                }
+            } catch (error) {
+                log(`Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+
+        function testIntelligentInit() {
+            try {
+                log('🧠 Test du système d\'initialisation intelligente...');
+                if (window.debugFaceServices) {
+                    // Simuler le processus d'import d'image
+                    log('📸 Simulation d\'import d\'image de référence...');
+                    
+                    // Vérifier l'état initial
+                    const initialStatus = window.debugFaceServices.checkStatus();
+                    log(`État initial: ${JSON.stringify(initialStatus)}`, 'info');
+                    
+                    if (!initialStatus.store.isInitialized) {
+                        log('⚡ Services non initialisés - Initialisation intelligente...', 'warning');
+                        
+                        // Simuler l'initialisation
+                        window.debugFaceServices.forceInit().then(result => {
+                            log(`✅ Initialisation intelligente réussie: ${JSON.stringify(result)}`, 'success');
+                            
+                            // Simuler l'analyse des photos
+                            log('🔍 Simulation de l\'analyse des photos non analysées...', 'info');
+                            
+                            // Vérifier l'état final
+                            setTimeout(() => {
+                                const finalStatus = window.debugFaceServices.checkStatus();
+                                log(`État final: ${JSON.stringify(finalStatus)}`, 'success');
+                                log('🎯 Système prêt pour la recherche optimisée!', 'success');
+                            }, 1000);
+                            
+                        }).catch(error => {
+                            log(`❌ Erreur d'initialisation intelligente: ${error.message}`, 'error');
+                        });
+                    } else {
+                        log('✅ Services déjà initialisés - Prêt pour la recherche', 'success');
+                    }
+                    
+                } else {
+                    log('Services de debug non disponibles', 'error');
+                }
+            } catch (error) {
+                log(`Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+
+        // Vérification automatique au chargement
+        window.addEventListener('load', () => {
+            log('Page de debug chargée', 'success');
+            setTimeout(() => {
+                if (window.debugFaceServices) {
+                    log('Services de debug disponibles', 'success');
+                    checkStatus();
+                } else {
+                    log('Services de debug non disponibles - L\'application n\'est peut-être pas chargée', 'warning');
+                }
+            }, 1000);
+        });
+
+        // Vérification périodique
+        setInterval(() => {
+            if (window.debugFaceServices) {
+                const status = window.debugFaceServices.checkStatus();
+                if (status.store.isLoading) {
+                    log('Services en cours d\'initialisation...', 'warning');
+                }
+            }
+        }, 5000);
+    </script>
+</body>
+</html> 

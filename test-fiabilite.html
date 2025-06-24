@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Fiabilité Recherche Faciale</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .container {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            background: #404040;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .result {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success { border-left: 4px solid #34C759; }
+        .warning { border-left: 4px solid #FF9500; }
+        .error { border-left: 4px solid #FF3B30; }
+        button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056CC; }
+        .slider-container {
+            margin: 10px 0;
+        }
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+        .value-display {
+            font-weight: bold;
+            color: #007AFF;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Fiabilité Recherche Faciale</h1>
+    
+    <div class="container">
+        <h2>🎛️ Paramètres de Test</h2>
+        
+        <div class="slider-container">
+            <label>Seuil de Similarité: <span class="value-display" id="similarity-value">30%</span></label>
+            <input type="range" id="similarity-slider" min="0.1" max="0.9" step="0.05" value="0.3">
+        </div>
+        
+        <div class="slider-container">
+            <label>Seuil de Confiance: <span class="value-display" id="confidence-value">50%</span></label>
+            <input type="range" id="confidence-slider" min="0.1" max="0.9" step="0.05" value="0.5">
+        </div>
+        
+        <div class="slider-container">
+            <label>Seuil de Qualité: <span class="value-display" id="quality-value">30%</span></label>
+            <input type="range" id="quality-slider" min="0.1" max="0.9" step="0.05" value="0.3">
+        </div>
+        
+        <div class="slider-container">
+            <label>Nombre Max de Résultats: <span class="value-display" id="max-results-value">50</span></label>
+            <input type="range" id="max-results-slider" min="1" max="100" step="1" value="50">
+        </div>
+        
+        <button onclick="runTest()">🚀 Lancer le Test</button>
+        <button onclick="clearResults()">🗑️ Effacer les Résultats</button>
+    </div>
+    
+    <div class="container">
+        <h2>📊 Résultats du Test</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        // Simuler les services de reconnaissance faciale
+        class MockFaceRecognitionService {
+            constructor() {
+                this.simulationMode = true;
+                this.minDescriptorQuality = 0.3;
+                this.confidenceThreshold = 0.5;
+            }
+
+            validateDescriptor(descriptor, imageSize = null) {
+                if (!descriptor || !Array.isArray(descriptor) || descriptor.length === 0) {
+                    return { isValid: false, quality: 0, reason: 'Descripteur vide ou invalide' };
+                }
+
+                if (descriptor.length !== 128) {
+                    return { isValid: false, quality: 0, reason: 'Taille de descripteur incorrecte' };
+                }
+
+                // Calculer la qualité basée sur la variance
+                const mean = descriptor.reduce((sum, val) => sum + val, 0) / descriptor.length;
+                const variance = descriptor.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / descriptor.length;
+                const stdDev = Math.sqrt(variance);
+                
+                let quality = Math.min(1, stdDev * 2);
+                
+                // En mode simulation, augmenter la qualité
+                if (this.simulationMode) {
+                    quality = Math.max(quality, 0.4);
+                }
+                
+                const effectiveMinQuality = this.simulationMode ? 0.2 : this.minDescriptorQuality;
+
+                return {
+                    isValid: quality >= effectiveMinQuality,
+                    quality: Math.max(0, Math.min(1, quality)),
+                    reason: quality >= effectiveMinQuality ? 'OK' : 'Qualité insuffisante'
+                };
+            }
+
+            compareDescriptors(descriptor1, descriptor2, options = {}) {
+                const validation1 = this.validateDescriptor(descriptor1);
+                const validation2 = this.validateDescriptor(descriptor2);
+                
+                if (!validation1.isValid || !validation2.isValid) {
+                    if (this.simulationMode) {
+                        console.log('🎭 Mode simulation: continuation malgré la faible qualité');
+                    } else {
+                        return {
+                            distance: 1,
+                            similarity: 0,
+                            isMatch: false,
+                            threshold: 0.3,
+                            confidence: 0,
+                            quality: {
+                                descriptor1Quality: validation1.quality,
+                                descriptor2Quality: validation2.quality,
+                                comparisonQuality: 0
+                            }
+                        };
+                    }
+                }
+                
+                // Générer des résultats réalistes en simulation
+                const baseSimilarity = Math.random() * 0.6 + 0.2;
+                const avgQuality = (validation1.quality + validation2.quality) / 2;
+                const adjustedSimilarity = baseSimilarity * (0.7 + 0.3 * avgQuality);
+                
+                const distance = 1 - adjustedSimilarity;
+                const similarity = adjustedSimilarity;
+                const confidence = Math.min(1, (similarity / 0.3) * 0.4 + avgQuality * 0.3 + Math.random() * 0.3);
+                
+                const effectiveConfidenceThreshold = this.simulationMode ? 0.3 : this.confidenceThreshold;
+                const isMatch = similarity >= 0.3 && confidence >= effectiveConfidenceThreshold;
+                
+                return {
+                    distance,
+                    similarity,
+                    isMatch,
+                    threshold: 0.3,
+                    confidence,
+                    quality: {
+                        descriptor1Quality: validation1.quality,
+                        descriptor2Quality: validation2.quality,
+                        comparisonQuality: similarity,
+                        averageQuality: avgQuality
+                    }
+                };
+            }
+
+            async findSimilarFaces(referenceDescriptor, photos, options = {}) {
+                const { 
+                    similarityThreshold = 0.3,
+                    maxResults = 50,
+                    minConfidence = 0.5,
+                    minQuality = 0.3
+                } = options;
+                
+                const referenceValidation = this.validateDescriptor(referenceDescriptor);
+                if (!referenceValidation.isValid && !this.simulationMode) {
+                    throw new Error(`Descripteur de référence invalide: ${referenceValidation.reason}`);
+                }
+                
+                const results = [];
+                const effectiveMinConfidence = this.simulationMode ? Math.min(minConfidence, 0.3) : minConfidence;
+                const effectiveMinQuality = this.simulationMode ? Math.min(minQuality, 0.2) : minQuality;
+                
+                for (const photo of photos) {
+                    if (photo.faceAnalysis && photo.faceAnalysis.faces && photo.faceAnalysis.faces.length > 0) {
+                        for (const face of photo.faceAnalysis.faces) {
+                            if (face.descriptor && Array.isArray(face.descriptor) && face.descriptor.length > 0) {
+                                const comparison = this.compareDescriptors(referenceDescriptor, face.descriptor);
+                                
+                                const meetsSimilarity = comparison.isMatch;
+                                const meetsConfidence = comparison.confidence >= effectiveMinConfidence;
+                                const meetsQuality = comparison.quality.averageQuality >= effectiveMinQuality;
+                                
+                                if (meetsSimilarity && meetsConfidence && meetsQuality) {
+                                    const finalScore = comparison.similarity * 0.7 + comparison.quality.averageQuality * 0.3;
+                                    
+                                    results.push({
+                                        id: photo.id,
+                                        fileName: photo.fileName,
+                                        similarity: comparison.similarity,
+                                        confidence: comparison.confidence,
+                                        finalScore: finalScore,
+                                        quality: comparison.quality
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                results.sort((a, b) => b.finalScore - a.finalScore);
+                return results.slice(0, maxResults);
+            }
+        }
+
+        // Créer une instance du service
+        const faceRecognitionService = new MockFaceRecognitionService();
+
+        // Fonction pour mettre à jour les valeurs affichées
+        function updateSliderValues() {
+            document.getElementById('similarity-value').textContent = 
+                (document.getElementById('similarity-slider').value * 100).toFixed(1) + '%';
+            document.getElementById('confidence-value').textContent = 
+                (document.getElementById('confidence-slider').value * 100).toFixed(1) + '%';
+            document.getElementById('quality-value').textContent = 
+                (document.getElementById('quality-slider').value * 100).toFixed(1) + '%';
+            document.getElementById('max-results-value').textContent = 
+                document.getElementById('max-results-slider').value;
+        }
+
+        // Fonction pour lancer le test
+        window.runTest = async function() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="result">🚀 Début du test...</div>';
+            
+            const similarityThreshold = parseFloat(document.getElementById('similarity-slider').value);
+            const confidenceThreshold = parseFloat(document.getElementById('confidence-slider').value);
+            const qualityThreshold = parseFloat(document.getElementById('quality-slider').value);
+            const maxResults = parseInt(document.getElementById('max-results-slider').value);
+            
+            try {
+                // Créer des données de test
+                const referenceDescriptor = Array(128).fill().map(() => Math.random());
+                const testPhotos = [
+                    { id: '1', fileName: 'photo1.jpg', faceAnalysis: { faces: [{ descriptor: Array(128).fill().map(() => Math.random()) }] } },
+                    { id: '2', fileName: 'photo2.jpg', faceAnalysis: { faces: [{ descriptor: Array(128).fill().map(() => Math.random()) }] } },
+                    { id: '3', fileName: 'photo3.jpg', faceAnalysis: { faces: [{ descriptor: Array(128).fill().map(() => Math.random()) }] } },
+                    { id: '4', fileName: 'photo4.jpg', faceAnalysis: { faces: [{ descriptor: Array(128).fill().map(() => Math.random()) }] } },
+                    { id: '5', fileName: 'photo5.jpg', faceAnalysis: { faces: [{ descriptor: Array(128).fill().map(() => Math.random()) }] } }
+                ];
+                
+                // Test 1: Validation des descripteurs
+                resultsDiv.innerHTML += '<div class="test-section"><h3>Test 1: Validation des Descripteurs</h3>';
+                const validation = faceRecognitionService.validateDescriptor(referenceDescriptor);
+                resultsDiv.innerHTML += `<div class="result ${validation.isValid ? 'success' : 'error'}">
+                    ✅ Validation: ${validation.isValid ? 'OK' : 'ÉCHEC'} - Qualité: ${(validation.quality * 100).toFixed(1)}% - ${validation.reason}
+                </div>`;
+                
+                // Test 2: Comparaison de descripteurs
+                resultsDiv.innerHTML += '<h3>Test 2: Comparaison de Descripteurs</h3>';
+                const comparison = faceRecognitionService.compareDescriptors(referenceDescriptor, testPhotos[0].faceAnalysis.faces[0].descriptor);
+                resultsDiv.innerHTML += `<div class="result ${comparison.isMatch ? 'success' : 'warning'}">
+                    🔍 Comparaison: ${comparison.isMatch ? 'MATCH' : 'NO MATCH'} - 
+                    Similarité: ${(comparison.similarity * 100).toFixed(1)}% - 
+                    Confiance: ${(comparison.confidence * 100).toFixed(1)}% - 
+                    Qualité: ${(comparison.quality.averageQuality * 100).toFixed(1)}%
+                </div>`;
+                
+                // Test 3: Recherche complète
+                resultsDiv.innerHTML += '<h3>Test 3: Recherche Complète</h3>';
+                const searchResults = await faceRecognitionService.findSimilarFaces(referenceDescriptor, testPhotos, {
+                    similarityThreshold,
+                    maxResults,
+                    minConfidence: confidenceThreshold,
+                    minQuality: qualityThreshold
+                });
+                
+                resultsDiv.innerHTML += `<div class="result success">
+                    📊 Recherche terminée: ${searchResults.length} résultat(s) trouvé(s)
+                </div>`;
+                
+                searchResults.forEach((result, index) => {
+                    resultsDiv.innerHTML += `<div class="result success">
+                        ${index + 1}. ${result.fileName}: 
+                        Similarité: ${(result.similarity * 100).toFixed(1)}% - 
+                        Confiance: ${(result.confidence * 100).toFixed(1)}% - 
+                        Qualité: ${(result.quality.averageQuality * 100).toFixed(1)}% - 
+                        Score: ${(result.finalScore * 100).toFixed(1)}%
+                    </div>`;
+                });
+                
+                resultsDiv.innerHTML += '</div>';
+                
+                // Test 4: Paramètres utilisés
+                resultsDiv.innerHTML += `<div class="test-section">
+                    <h3>Test 4: Paramètres Utilisés</h3>
+                    <div class="result">
+                        🎯 Seuil de Similarité: ${(similarityThreshold * 100).toFixed(1)}%<br>
+                        🎯 Seuil de Confiance: ${(confidenceThreshold * 100).toFixed(1)}%<br>
+                        🎯 Seuil de Qualité: ${(qualityThreshold * 100).toFixed(1)}%<br>
+                        📊 Nombre Max de Résultats: ${maxResults}
+                    </div>
+                </div>`;
+                
+            } catch (error) {
+                resultsDiv.innerHTML += `<div class="result error">❌ Erreur: ${error.message}</div>`;
+            }
+        };
+
+        // Fonction pour effacer les résultats
+        window.clearResults = function() {
+            document.getElementById('test-results').innerHTML = '';
+        };
+
+        // Initialiser les événements
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSliderValues();
+            
+            // Ajouter les événements pour les sliders
+            document.getElementById('similarity-slider').addEventListener('input', updateSliderValues);
+            document.getElementById('confidence-slider').addEventListener('input', updateSliderValues);
+            document.getElementById('quality-slider').addEventListener('input', updateSliderValues);
+            document.getElementById('max-results-slider').addEventListener('input', updateSliderValues);
+        });
+    </script>
+</body>
+</html> 
